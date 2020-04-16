@@ -2,6 +2,7 @@ module Main exposing (main)
 
 import Browser
 import Html exposing (Html, div, text, textarea)
+import Html.Attributes exposing (class)
 
 
 main : Program () Model Msg
@@ -53,5 +54,5 @@ view : Model -> Html Msg
 view model =
     div []
         [ div [] [ text "csv" ]
-        , textarea [] [ text "New Element" ]
+        , textarea [ class "csv-area" ] [ text "New Element" ]
         ]
