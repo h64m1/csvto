@@ -1,4 +1,23 @@
+#app {
+	display: grid;
+	grid-template-columns: 20rem 1fr 20rem;
+	grid-template-areas: 'left-nav main right-nav';
+}
+
+#left-nav {
+	grid-area: 'nav';
+}
+
+#main-container {
+	grid-area: 'main';
+}
+
+.title {
+	font-size: larger;
+}
 
 .csv-area {
-    width: 100%;
+	width: 100%;
+	height: 20rem;
+	font-size: medium;
 }
