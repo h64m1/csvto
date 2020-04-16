@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Browser
 import Html exposing (Html, div, text, textarea)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, id, placeholder)
 
 
 main : Program () Model Msg
@@ -50,9 +50,25 @@ subscriptions _ =
     Sub.none
 
 
+
+-- VIEW
+
+
 view : Model -> Html Msg
 view model =
-    div []
-        [ div [] [ text "csv" ]
-        , textarea [ class "csv-area" ] [ text "New Element" ]
+    div [ id "app" ]
+        [ div [ id "left-nav" ] []
+        , mainContainer model
+        ]
+
+
+
+-- MAIN CONTAINER
+
+
+mainContainer : Model -> Html msg
+mainContainer model =
+    div [ id "main-container" ]
+        [ div [ class "title" ] [ text "csv" ]
+        , textarea [ class "csv-area", placeholder "csv: a, b, c, ..." ] [ text "" ]
         ]
