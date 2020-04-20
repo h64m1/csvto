@@ -5167,8 +5167,8 @@ var $elm$json$Json$Encode$list = F2(
 				entries));
 	});
 var $elm$json$Json$Encode$string = _Json_wrap;
-var $author$project$Main$saveCsv = _Platform_outgoingPort(
-	'saveCsv',
+var $author$project$Main$saveArray = _Platform_outgoingPort(
+	'saveArray',
 	$elm$json$Json$Encode$list($elm$json$Json$Encode$string));
 var $author$project$Main$update = F2(
 	function (msg, model) {
@@ -5192,7 +5192,7 @@ var $author$project$Main$update = F2(
 		} else {
 			return _Utils_Tuple2(
 				model,
-				$author$project$Main$saveCsv(model.arrayInput));
+				$author$project$Main$saveArray(model.arrayInput));
 		}
 	});
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -5206,15 +5206,33 @@ var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id'
 var $author$project$Main$Input = function (a) {
 	return {$: 'Input', a: a};
 };
+var $author$project$Main$Preview = {$: 'Preview'};
+var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
 var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
 	return {$: 'MayStopPropagation', a: a};
 };
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
 var $elm$html$Html$Events$stopPropagationOn = F2(
 	function (event, decoder) {
 		return A2(
@@ -5265,7 +5283,17 @@ var $author$project$Main$mainContainer = function (model) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('csv')
+						$elm$html$Html$text('csv'),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onClick($author$project$Main$Preview)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('preview')
+							]))
 					])),
 				A2(
 				$elm$html$Html$textarea,

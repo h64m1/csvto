@@ -5,13 +5,16 @@
   <title>csv to</title>
   <link rel="stylesheet" href="main.css">
   <script src="main.js"></script>
+  <script src="dist/array.js"></script>
 </head>
 <body>
   <div id="elm-app"></div>
   <script>
-  Elm.Main.init({
+  const app = Elm.Main.init({
     node: document.getElementById("elm-app")
-  });</script>
+  });
+  app.ports.saveArray.subscribe(saveArray)
+  </script>
 </body>
 </html>
 
