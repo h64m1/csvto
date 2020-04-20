@@ -1,8 +1,10 @@
-module Main exposing (main)
+port module Main exposing (main)
 
 import Browser
+import Debug
 import Html exposing (Html, div, main_, nav, section, text, textarea)
-import Html.Attributes exposing (class, id, placeholder)
+import Html.Attributes exposing (class, id, placeholder, value)
+import Html.Events exposing (onInput)
 
 
 main : Program () Model Msg
@@ -19,30 +21,48 @@ main =
 -- MODEL
 
 
-type Model
-    = Failure
-    | Loading
-    | Success
+type alias Model =
+    { input : String
+    , arrayInput : List String
+    }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Failure, Cmd.none )
+    ( { input = "", arrayInput = [] }, Cmd.none )
 
 
 type Msg
-    = Msg1
-    | Msg2
+    = Input String
+    | Preview
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Msg1 ->
-            ( model, Cmd.none )
+        Input input ->
+            ( { model
+                | input =
+                    let
+                        _ =
+                            Debug.log "input" input
+                    in
+                    input
+                , arrayInput =
+                    let
+                        array =
+                            input |> String.split ","
 
-        Msg2 ->
-            ( model, Cmd.none )
+                        _ =
+                            Debug.log "array" array
+                    in
+                    array
+              }
+            , Cmd.none
+            )
+
+        Preview ->
+            ( model, saveCsv model.arrayInput )
 
 
 subscriptions : Model -> Sub Msg
@@ -66,9 +86,12 @@ view model =
 -- MAIN CONTAINER
 
 
-mainContainer : Model -> Html msg
+mainContainer : Model -> Html Msg
 mainContainer model =
     section [ class "main-container" ]
         [ div [ class "title" ] [ text "csv" ]
-        , textarea [ class "csv-area", placeholder "csv: a, b, c, ..." ] [ text "" ]
+        , textarea [ class "csv-area", placeholder "csv: a, b, c, ...", value model.input, onInput Input ] [ text "" ]
         ]
+
+
+port saveCsv : List String -> Cmd msg
