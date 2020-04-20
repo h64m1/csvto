@@ -2,9 +2,9 @@ port module Main exposing (main)
 
 import Browser
 import Debug
-import Html exposing (Html, div, main_, nav, section, text, textarea)
+import Html exposing (Html, button, div, main_, nav, section, text, textarea)
 import Html.Attributes exposing (class, id, placeholder, value)
-import Html.Events exposing (onInput)
+import Html.Events exposing (onClick, onInput)
 
 
 main : Program () Model Msg
@@ -62,7 +62,7 @@ update msg model =
             )
 
         Preview ->
-            ( model, saveCsv model.arrayInput )
+            ( model, saveArray model.arrayInput )
 
 
 subscriptions : Model -> Sub Msg
@@ -89,9 +89,9 @@ view model =
 mainContainer : Model -> Html Msg
 mainContainer model =
     section [ class "main-container" ]
-        [ div [ class "title" ] [ text "csv" ]
+        [ div [ class "title" ] [ text "csv", button [ onClick Preview ] [ text "preview" ] ]
         , textarea [ class "csv-area", placeholder "csv: a, b, c, ...", value model.input, onInput Input ] [ text "" ]
         ]
 
 
-port saveCsv : List String -> Cmd msg
+port saveArray : List String -> Cmd msg
