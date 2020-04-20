@@ -5163,7 +5163,6 @@ var $author$project$Main$update = F2(
 			return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
-var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -5174,16 +5173,18 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $elm$html$Html$section = _VirtualDom_node('section');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $author$project$Main$mainContainer = function (model) {
 	return A2(
-		$elm$html$Html$div,
+		$elm$html$Html$section,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$id('main-container')
+				$elm$html$Html$Attributes$class('main-container')
 			]),
 		_List_fromArray(
 			[
@@ -5210,9 +5211,11 @@ var $author$project$Main$mainContainer = function (model) {
 					]))
 			]));
 };
+var $elm$html$Html$main_ = _VirtualDom_node('main');
+var $elm$html$Html$nav = _VirtualDom_node('nav');
 var $author$project$Main$view = function (model) {
 	return A2(
-		$elm$html$Html$div,
+		$elm$html$Html$main_,
 		_List_fromArray(
 			[
 				$elm$html$Html$Attributes$id('app')
@@ -5220,7 +5223,7 @@ var $author$project$Main$view = function (model) {
 		_List_fromArray(
 			[
 				A2(
-				$elm$html$Html$div,
+				$elm$html$Html$nav,
 				_List_fromArray(
 					[
 						$elm$html$Html$Attributes$id('left-nav')
