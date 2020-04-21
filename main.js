@@ -5203,12 +5203,12 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $author$project$Main$Input = function (a) {
 	return {$: 'Input', a: a};
 };
 var $author$project$Main$Preview = {$: 'Preview'};
 var $elm$html$Html$button = _VirtualDom_node('button');
-var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
@@ -5261,17 +5261,16 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
-var $elm$html$Html$section = _VirtualDom_node('section');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Main$mainContainer = function (model) {
+var $author$project$Main$csvContainer = function (model) {
 	return A2(
-		$elm$html$Html$section,
+		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('main-container')
+				$elm$html$Html$Attributes$class('csv-container')
 			]),
 		_List_fromArray(
 			[
@@ -5308,6 +5307,76 @@ var $author$project$Main$mainContainer = function (model) {
 					[
 						$elm$html$Html$text('')
 					]))
+			]));
+};
+var $elm$html$Html$table = _VirtualDom_node('table');
+var $elm$html$Html$tbody = _VirtualDom_node('tbody');
+var $elm$html$Html$td = _VirtualDom_node('td');
+var $author$project$Main$tdElement = function (input) {
+	return A2(
+		$elm$html$Html$td,
+		_List_Nil,
+		_List_fromArray(
+			[
+				$elm$html$Html$text(input)
+			]));
+};
+var $elm$html$Html$tr = _VirtualDom_node('tr');
+var $author$project$Main$previewTableView = function (model) {
+	return A2(
+		$elm$html$Html$table,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('preview-area')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$tbody,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$tr,
+						_List_Nil,
+						A2($elm$core$List$map, $author$project$Main$tdElement, model.arrayInput))
+					]))
+			]));
+};
+var $author$project$Main$previewContainer = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('preview-container')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('title')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('preview')
+					])),
+				$author$project$Main$previewTableView(model)
+			]));
+};
+var $elm$html$Html$section = _VirtualDom_node('section');
+var $author$project$Main$mainContainer = function (model) {
+	return A2(
+		$elm$html$Html$section,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('main-container')
+			]),
+		_List_fromArray(
+			[
+				$author$project$Main$csvContainer(model),
+				$author$project$Main$previewContainer(model)
 			]));
 };
 var $elm$html$Html$main_ = _VirtualDom_node('main');

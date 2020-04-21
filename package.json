@@ -10,9 +10,9 @@
 	},
 	"devDependencies": {},
 	"scripts": {
-		"build": "npm run build:elm & npm run build:ts",
+		"build": "npm run build:elm & npm run build:ts & npm run css",
 		"build:elm": "elm make src/Main.elm --output=main.js",
-		"build:ts": "tsc ts/array.ts",
+		"build:ts": "tsc ts/array.ts --outFile dist/array.js",
 		"css": "sass sass/main.scss main.css",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
