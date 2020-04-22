@@ -24,17 +24,36 @@ main =
 type alias Model =
     { csvInput : String -- csvの入力値
     , arrayInput : Array (List String) -- csv入力を変換した2次元配列
+    , showView : ViewDisplayState -- viewの表示状態
     }
+
+
+
+{-
+   csv, markdown領域の表示管理フラグ
+   defaultではcsvを表示
+-}
+
+
+type ViewDisplayState
+    = Csv
+    | Markdown
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { csvInput = "", arrayInput = Array.fromList [] }, Cmd.none )
+    ( { csvInput = ""
+      , arrayInput = Array.fromList []
+      , showView = Csv
+      }
+    , Cmd.none
+    )
 
 
 type Msg
     = CsvInput String
-    | Preview
+    | ShowCsv
+    | ShowMarkdown
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -60,8 +79,11 @@ update msg model =
             , Cmd.none
             )
 
-        Preview ->
-            ( model, saveArray model.arrayInput )
+        ShowCsv ->
+            ( { model | showView = Csv }, Cmd.none )
+
+        ShowMarkdown ->
+            ( { model | showView = Markdown }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -88,9 +110,28 @@ view model =
 mainContainer : Model -> Html Msg
 mainContainer model =
     section [ class "main-container" ]
-        [ csvContainer model
+        [ inputContainer model
         , previewContainer model
         ]
+
+
+
+{-
+   入力可能な領域を表示するcontainer
+   showViewの状態によって表示領域を変える
+   csv: csv入力エリアを表示
+   markdown: markdown入力エリアを表示（TODO: 一旦csvエリアを表示、markdown表示エリアは要実装）
+-}
+
+
+inputContainer : Model -> Html Msg
+inputContainer model =
+    case model.showView of
+        Csv ->
+            csvContainer model
+
+        Markdown ->
+            csvContainer model
 
 
 
@@ -100,7 +141,7 @@ mainContainer model =
 csvContainer : Model -> Html Msg
 csvContainer model =
     div [ class "csv-container" ]
-        [ div [ class "title" ] [ text "csv", button [ onClick Preview ] [ text "preview" ] ]
+        [ div [ class "title" ] [ text "csv" ] -- button [ onClick Preview ] [ text "preview" ]
         , textarea [ class "csv-area", placeholder "csv: a, b, c, ...", value model.csvInput, onInput CsvInput ] [ text "" ]
         ]
 
