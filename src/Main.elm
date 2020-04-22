@@ -1,8 +1,9 @@
 port module Main exposing (main)
 
+import Array exposing (Array)
 import Browser
 import Debug
-import Html exposing (Html, button, div, main_, nav, section, table, tbody, td, text, textarea, tr)
+import Html exposing (Html, button, div, main_, nav, section, table, tbody, td, text, textarea, thead, tr)
 import Html.Attributes exposing (class, id, placeholder, style, value)
 import Html.Events exposing (onClick, onInput)
 
@@ -23,13 +24,13 @@ main =
 
 type alias Model =
     { input : String
-    , arrayInput : List String
+    , arrayInput : Array (List String)
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { input = "", arrayInput = [] }, Cmd.none )
+    ( { input = "", arrayInput = Array.fromList [] }, Cmd.none )
 
 
 type Msg
@@ -50,8 +51,12 @@ update msg model =
                     input
                 , arrayInput =
                     let
+                        -- 1. 改行コードで分割、2. カンマで分割、で行ごとに配列化
                         array =
-                            input |> String.split ","
+                            input
+                                |> String.lines
+                                |> List.map (String.split ",")
+                                |> Array.fromList
 
                         _ =
                             Debug.log "array" array
@@ -125,11 +130,71 @@ previewContainer model =
 previewTableView : Model -> Html Msg
 previewTableView model =
     table [ class "preview-area" ]
-        [ tbody []
-            [ tr []
-                (model.arrayInput |> List.map tdElement)
-            ]
+        [ headerView model
+        , bodyView model
         ]
+
+
+
+-- タイトル行
+
+
+headerView : Model -> Html Msg
+headerView model =
+    thead [ class "preview-header" ] [ rowView model 0 ]
+
+
+
+-- テーブル本体
+
+
+bodyView : Model -> Html Msg
+bodyView model =
+    tbody []
+        (rowViewList model 1 (Array.length model.arrayInput - 1))
+
+
+
+-- テーブルの本体中身
+{- 以下のような形
+   [ tr [] (trElement model 1)
+   , tr [] (trElement model 2)
+   , tr [] (trElement model 3)
+   ]
+-}
+
+
+rowViewList : Model -> Int -> Int -> List (Html msg)
+rowViewList model start end =
+    List.range start end
+        |> List.map (rowView model)
+
+
+
+-- テーブルの行を描画
+
+
+rowView : Model -> Int -> Html msg
+rowView model index =
+    tr [] (trElement model index)
+
+
+
+-- 2次元配列の特定要素からテーブルのDOMを生成
+
+
+trElement : Model -> Int -> List (Html msg)
+trElement model index =
+    Maybe.withDefault []
+        (Array.get index
+            (model.arrayInput
+                |> Array.map (List.map tdElement)
+            )
+        )
+
+
+
+-- TD要素を作成
 
 
 tdElement : String -> Html msg
@@ -137,4 +202,4 @@ tdElement input =
     td [] [ text input ]
 
 
-port saveArray : List String -> Cmd msg
+port saveArray : Array (List String) -> Cmd msg

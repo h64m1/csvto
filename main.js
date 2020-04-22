@@ -4355,6 +4355,43 @@ function _Browser_load(url)
 		}
 	}));
 }
+
+
+
+var _Bitwise_and = F2(function(a, b)
+{
+	return a & b;
+});
+
+var _Bitwise_or = F2(function(a, b)
+{
+	return a | b;
+});
+
+var _Bitwise_xor = F2(function(a, b)
+{
+	return a ^ b;
+});
+
+function _Bitwise_complement(a)
+{
+	return ~a;
+};
+
+var _Bitwise_shiftLeftBy = F2(function(offset, a)
+{
+	return a << offset;
+});
+
+var _Bitwise_shiftRightBy = F2(function(offset, a)
+{
+	return a >> offset;
+});
+
+var _Bitwise_shiftRightZfBy = F2(function(offset, a)
+{
+	return a >>> offset;
+});
 var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
@@ -5144,11 +5181,49 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
+var $elm$core$Array$fromListHelp = F3(
+	function (list, nodeList, nodeListSize) {
+		fromListHelp:
+		while (true) {
+			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, list);
+			var jsArray = _v0.a;
+			var remainingItems = _v0.b;
+			if (_Utils_cmp(
+				$elm$core$Elm$JsArray$length(jsArray),
+				$elm$core$Array$branchFactor) < 0) {
+				return A2(
+					$elm$core$Array$builderToArray,
+					true,
+					{nodeList: nodeList, nodeListSize: nodeListSize, tail: jsArray});
+			} else {
+				var $temp$list = remainingItems,
+					$temp$nodeList = A2(
+					$elm$core$List$cons,
+					$elm$core$Array$Leaf(jsArray),
+					nodeList),
+					$temp$nodeListSize = nodeListSize + 1;
+				list = $temp$list;
+				nodeList = $temp$nodeList;
+				nodeListSize = $temp$nodeListSize;
+				continue fromListHelp;
+			}
+		}
+	});
+var $elm$core$Array$fromList = function (list) {
+	if (!list.b) {
+		return $elm$core$Array$empty;
+	} else {
+		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
+	}
+};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		{arrayInput: _List_Nil, input: ''},
+		{
+			arrayInput: $elm$core$Array$fromList(_List_Nil),
+			input: ''
+		},
 		$elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -5156,7 +5231,38 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (_v0) {
 	return $elm$core$Platform$Sub$none;
 };
+var $elm$core$String$lines = _String_lines;
 var $elm$core$Debug$log = _Debug_log;
+var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
+var $elm$core$Array$foldl = F3(
+	function (func, baseCase, _v0) {
+		var tree = _v0.c;
+		var tail = _v0.d;
+		var helper = F2(
+			function (node, acc) {
+				if (node.$ === 'SubTree') {
+					var subTree = node.a;
+					return A3($elm$core$Elm$JsArray$foldl, helper, acc, subTree);
+				} else {
+					var values = node.a;
+					return A3($elm$core$Elm$JsArray$foldl, func, acc, values);
+				}
+			});
+		return A3(
+			$elm$core$Elm$JsArray$foldl,
+			func,
+			A3($elm$core$Elm$JsArray$foldl, helper, baseCase, tree),
+			tail);
+	});
+var $elm$json$Json$Encode$array = F2(
+	function (func, entries) {
+		return _Json_wrap(
+			A3(
+				$elm$core$Array$foldl,
+				_Json_addEntry(func),
+				_Json_emptyArray(_Utils_Tuple0),
+				entries));
+	});
 var $elm$json$Json$Encode$list = F2(
 	function (func, entries) {
 		return _Json_wrap(
@@ -5169,7 +5275,8 @@ var $elm$json$Json$Encode$list = F2(
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $author$project$Main$saveArray = _Platform_outgoingPort(
 	'saveArray',
-	$elm$json$Json$Encode$list($elm$json$Json$Encode$string));
+	$elm$json$Json$Encode$array(
+		$elm$json$Json$Encode$list($elm$json$Json$Encode$string)));
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		if (msg.$ === 'Input') {
@@ -5179,7 +5286,11 @@ var $author$project$Main$update = F2(
 					model,
 					{
 						arrayInput: function () {
-							var array = A2($elm$core$String$split, ',', input);
+							var array = $elm$core$Array$fromList(
+								A2(
+									$elm$core$List$map,
+									$elm$core$String$split(','),
+									$elm$core$String$lines(input)));
 							var _v1 = A2($elm$core$Debug$log, 'array', array);
 							return array;
 						}(),
@@ -5309,8 +5420,78 @@ var $author$project$Main$csvContainer = function (model) {
 					]))
 			]));
 };
-var $elm$html$Html$table = _VirtualDom_node('table');
-var $elm$html$Html$tbody = _VirtualDom_node('tbody');
+var $elm$core$Array$length = function (_v0) {
+	var len = _v0.a;
+	return len;
+};
+var $elm$html$Html$tr = _VirtualDom_node('tr');
+var $elm$core$Bitwise$and = _Bitwise_and;
+var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
+var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
+var $elm$core$Basics$ge = _Utils_ge;
+var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
+var $elm$core$Array$getHelp = F3(
+	function (shift, index, tree) {
+		getHelp:
+		while (true) {
+			var pos = $elm$core$Array$bitMask & (index >>> shift);
+			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+			if (_v0.$ === 'SubTree') {
+				var subTree = _v0.a;
+				var $temp$shift = shift - $elm$core$Array$shiftStep,
+					$temp$index = index,
+					$temp$tree = subTree;
+				shift = $temp$shift;
+				index = $temp$index;
+				tree = $temp$tree;
+				continue getHelp;
+			} else {
+				var values = _v0.a;
+				return A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, values);
+			}
+		}
+	});
+var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
+var $elm$core$Array$tailIndex = function (len) {
+	return (len >>> 5) << 5;
+};
+var $elm$core$Array$get = F2(
+	function (index, _v0) {
+		var len = _v0.a;
+		var startShift = _v0.b;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? $elm$core$Maybe$Nothing : ((_Utils_cmp(
+			index,
+			$elm$core$Array$tailIndex(len)) > -1) ? $elm$core$Maybe$Just(
+			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
+			A3($elm$core$Array$getHelp, startShift, index, tree)));
+	});
+var $elm$core$Elm$JsArray$map = _JsArray_map;
+var $elm$core$Array$map = F2(
+	function (func, _v0) {
+		var len = _v0.a;
+		var startShift = _v0.b;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		var helper = function (node) {
+			if (node.$ === 'SubTree') {
+				var subTree = node.a;
+				return $elm$core$Array$SubTree(
+					A2($elm$core$Elm$JsArray$map, helper, subTree));
+			} else {
+				var values = node.a;
+				return $elm$core$Array$Leaf(
+					A2($elm$core$Elm$JsArray$map, func, values));
+			}
+		};
+		return A4(
+			$elm$core$Array$Array_elm_builtin,
+			len,
+			startShift,
+			A2($elm$core$Elm$JsArray$map, helper, tree),
+			A2($elm$core$Elm$JsArray$map, func, tail));
+	});
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $author$project$Main$tdElement = function (input) {
 	return A2(
@@ -5321,7 +5502,67 @@ var $author$project$Main$tdElement = function (input) {
 				$elm$html$Html$text(input)
 			]));
 };
-var $elm$html$Html$tr = _VirtualDom_node('tr');
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Main$trElement = F2(
+	function (model, index) {
+		return A2(
+			$elm$core$Maybe$withDefault,
+			_List_Nil,
+			A2(
+				$elm$core$Array$get,
+				index,
+				A2(
+					$elm$core$Array$map,
+					$elm$core$List$map($author$project$Main$tdElement),
+					model.arrayInput)));
+	});
+var $author$project$Main$rowView = F2(
+	function (model, index) {
+		return A2(
+			$elm$html$Html$tr,
+			_List_Nil,
+			A2($author$project$Main$trElement, model, index));
+	});
+var $author$project$Main$rowViewList = F3(
+	function (model, start, end) {
+		return A2(
+			$elm$core$List$map,
+			$author$project$Main$rowView(model),
+			A2($elm$core$List$range, start, end));
+	});
+var $elm$html$Html$tbody = _VirtualDom_node('tbody');
+var $author$project$Main$bodyView = function (model) {
+	return A2(
+		$elm$html$Html$tbody,
+		_List_Nil,
+		A3(
+			$author$project$Main$rowViewList,
+			model,
+			1,
+			$elm$core$Array$length(model.arrayInput) - 1));
+};
+var $elm$html$Html$thead = _VirtualDom_node('thead');
+var $author$project$Main$headerView = function (model) {
+	return A2(
+		$elm$html$Html$thead,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('preview-header')
+			]),
+		_List_fromArray(
+			[
+				A2($author$project$Main$rowView, model, 0)
+			]));
+};
+var $elm$html$Html$table = _VirtualDom_node('table');
 var $author$project$Main$previewTableView = function (model) {
 	return A2(
 		$elm$html$Html$table,
@@ -5331,16 +5572,8 @@ var $author$project$Main$previewTableView = function (model) {
 			]),
 		_List_fromArray(
 			[
-				A2(
-				$elm$html$Html$tbody,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$tr,
-						_List_Nil,
-						A2($elm$core$List$map, $author$project$Main$tdElement, model.arrayInput))
-					]))
+				$author$project$Main$headerView(model),
+				$author$project$Main$bodyView(model)
 			]));
 };
 var $author$project$Main$previewContainer = function (model) {
