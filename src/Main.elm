@@ -2,9 +2,8 @@ port module Main exposing (main)
 
 import Array exposing (Array)
 import Browser
-import Debug
 import Html exposing (Html, button, div, main_, nav, section, table, tbody, td, text, textarea, thead, tr)
-import Html.Attributes exposing (class, id, placeholder, style, value)
+import Html.Attributes exposing (class, id, placeholder, value)
 import Html.Events exposing (onClick, onInput)
 
 
@@ -23,32 +22,27 @@ main =
 
 
 type alias Model =
-    { input : String
-    , arrayInput : Array (List String)
+    { csvInput : String -- csvの入力値
+    , arrayInput : Array (List String) -- csv入力を変換した2次元配列
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { input = "", arrayInput = Array.fromList [] }, Cmd.none )
+    ( { csvInput = "", arrayInput = Array.fromList [] }, Cmd.none )
 
 
 type Msg
-    = Input String
+    = CsvInput String
     | Preview
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Input input ->
+        CsvInput input ->
             ( { model
-                | input =
-                    let
-                        _ =
-                            Debug.log "input" input
-                    in
-                    input
+                | csvInput = input
                 , arrayInput =
                     let
                         -- 1. 改行コードで分割、2. カンマで分割、で行ごとに配列化
@@ -58,8 +52,8 @@ update msg model =
                                 |> List.map (String.split ",")
                                 |> Array.fromList
 
-                        _ =
-                            Debug.log "array" array
+                        -- _ =
+                        --     Debug.log "array" array
                     in
                     array
               }
@@ -107,7 +101,7 @@ csvContainer : Model -> Html Msg
 csvContainer model =
     div [ class "csv-container" ]
         [ div [ class "title" ] [ text "csv", button [ onClick Preview ] [ text "preview" ] ]
-        , textarea [ class "csv-area", placeholder "csv: a, b, c, ...", value model.input, onInput Input ] [ text "" ]
+        , textarea [ class "csv-area", placeholder "csv: a, b, c, ...", value model.csvInput, onInput CsvInput ] [ text "" ]
         ]
 
 
