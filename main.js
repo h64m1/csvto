@@ -5181,6 +5181,7 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Main$Csv = {$: 'Csv'};
 var $elm$core$Array$fromListHelp = F3(
 	function (list, nodeList, nodeListSize) {
 		fromListHelp:
@@ -5222,7 +5223,9 @@ var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
 		{
 			arrayInput: $elm$core$Array$fromList(_List_Nil),
-			input: ''
+			csvInput: '',
+			markdownInput: '',
+			showView: $author$project$Main$Csv
 		},
 		$elm$core$Platform$Cmd$none);
 };
@@ -5231,81 +5234,50 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (_v0) {
 	return $elm$core$Platform$Sub$none;
 };
+var $author$project$Main$Markdown = {$: 'Markdown'};
 var $elm$core$String$lines = _String_lines;
-var $elm$core$Debug$log = _Debug_log;
-var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
-var $elm$core$Array$foldl = F3(
-	function (func, baseCase, _v0) {
-		var tree = _v0.c;
-		var tail = _v0.d;
-		var helper = F2(
-			function (node, acc) {
-				if (node.$ === 'SubTree') {
-					var subTree = node.a;
-					return A3($elm$core$Elm$JsArray$foldl, helper, acc, subTree);
-				} else {
-					var values = node.a;
-					return A3($elm$core$Elm$JsArray$foldl, func, acc, values);
-				}
-			});
-		return A3(
-			$elm$core$Elm$JsArray$foldl,
-			func,
-			A3($elm$core$Elm$JsArray$foldl, helper, baseCase, tree),
-			tail);
-	});
-var $elm$json$Json$Encode$array = F2(
-	function (func, entries) {
-		return _Json_wrap(
-			A3(
-				$elm$core$Array$foldl,
-				_Json_addEntry(func),
-				_Json_emptyArray(_Utils_Tuple0),
-				entries));
-	});
-var $elm$json$Json$Encode$list = F2(
-	function (func, entries) {
-		return _Json_wrap(
-			A3(
-				$elm$core$List$foldl,
-				_Json_addEntry(func),
-				_Json_emptyArray(_Utils_Tuple0),
-				entries));
-	});
-var $elm$json$Json$Encode$string = _Json_wrap;
-var $author$project$Main$saveArray = _Platform_outgoingPort(
-	'saveArray',
-	$elm$json$Json$Encode$array(
-		$elm$json$Json$Encode$list($elm$json$Json$Encode$string)));
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		if (msg.$ === 'Input') {
-			var input = msg.a;
-			return _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{
-						arrayInput: function () {
-							var array = $elm$core$Array$fromList(
-								A2(
-									$elm$core$List$map,
-									$elm$core$String$split(','),
-									$elm$core$String$lines(input)));
-							var _v1 = A2($elm$core$Debug$log, 'array', array);
-							return array;
-						}(),
-						input: function () {
-							var _v2 = A2($elm$core$Debug$log, 'input', input);
-							return input;
-						}()
-					}),
-				$elm$core$Platform$Cmd$none);
-		} else {
-			return _Utils_Tuple2(
-				model,
-				$author$project$Main$saveArray(model.arrayInput));
+		switch (msg.$) {
+			case 'CsvInput':
+				var input = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							arrayInput: function () {
+								var array = $elm$core$Array$fromList(
+									A2(
+										$elm$core$List$map,
+										$elm$core$String$split(','),
+										$elm$core$String$lines(input)));
+								return array;
+							}(),
+							csvInput: input
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'MarkdownInput':
+				var input = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{markdownInput: input}),
+					$elm$core$Platform$Cmd$none);
+			case 'ShowCsv':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{showView: $author$project$Main$Csv}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{showView: $author$project$Main$Markdown}),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
+var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
 		return A2(
@@ -5315,12 +5287,16 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
-var $author$project$Main$Input = function (a) {
-	return {$: 'Input', a: a};
-};
-var $author$project$Main$Preview = {$: 'Preview'};
-var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $author$project$Main$ShowCsv = {$: 'ShowCsv'};
+var $author$project$Main$ShowMarkdown = {$: 'ShowMarkdown'};
+var $elm$html$Html$a = _VirtualDom_node('a');
+var $elm$html$Html$Attributes$href = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'href',
+		_VirtualDom_noJavaScriptUri(url));
+};
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -5337,6 +5313,54 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		$elm$html$Html$Events$on,
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$html$Html$span = _VirtualDom_node('span');
+var $author$project$Main$tabClassName = F2(
+	function (state, model) {
+		return _Utils_eq(state, model.showView) ? 'tab-selected' : 'tab-not-selected';
+	});
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Main$tabView = F4(
+	function (state, model, msg, title) {
+		return A2(
+			$elm$html$Html$a,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('tab'),
+					$elm$html$Html$Attributes$href('#')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$span,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class(
+							A2($author$project$Main$tabClassName, state, model)),
+							$elm$html$Html$Events$onClick(msg)
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(title)
+						]))
+				]));
+	});
+var $author$project$Main$headerView = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('input-container')
+			]),
+		_List_fromArray(
+			[
+				A4($author$project$Main$tabView, $author$project$Main$Csv, model, $author$project$Main$ShowCsv, 'csv'),
+				A4($author$project$Main$tabView, $author$project$Main$Markdown, model, $author$project$Main$ShowMarkdown, 'markdown')
+			]));
+};
+var $author$project$Main$CsvInput = function (a) {
+	return {$: 'CsvInput', a: a};
 };
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
@@ -5372,8 +5396,6 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$csvContainer = function (model) {
@@ -5386,33 +5408,13 @@ var $author$project$Main$csvContainer = function (model) {
 		_List_fromArray(
 			[
 				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('title')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('csv'),
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Events$onClick($author$project$Main$Preview)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('preview')
-							]))
-					])),
-				A2(
 				$elm$html$Html$textarea,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('csv-area'),
+						$elm$html$Html$Attributes$class('input-area'),
 						$elm$html$Html$Attributes$placeholder('csv: a, b, c, ...'),
-						$elm$html$Html$Attributes$value(model.input),
-						$elm$html$Html$Events$onInput($author$project$Main$Input)
+						$elm$html$Html$Attributes$value(model.csvInput),
+						$elm$html$Html$Events$onInput($author$project$Main$CsvInput)
 					]),
 				_List_fromArray(
 					[
@@ -5420,6 +5422,42 @@ var $author$project$Main$csvContainer = function (model) {
 					]))
 			]));
 };
+var $author$project$Main$MarkdownInput = function (a) {
+	return {$: 'MarkdownInput', a: a};
+};
+var $author$project$Main$markdownContainer = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('markdown-container')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$textarea,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('input-area'),
+						$elm$html$Html$Attributes$placeholder('write markdown table'),
+						$elm$html$Html$Attributes$value(model.markdownInput),
+						$elm$html$Html$Events$onInput($author$project$Main$MarkdownInput)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('')
+					]))
+			]));
+};
+var $author$project$Main$inputContainer = function (model) {
+	var _v0 = model.showView;
+	if (_v0.$ === 'Csv') {
+		return $author$project$Main$csvContainer(model);
+	} else {
+		return $author$project$Main$markdownContainer(model);
+	}
+};
+var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$core$Array$length = function (_v0) {
 	var len = _v0.a;
 	return len;
@@ -5539,7 +5577,7 @@ var $author$project$Main$rowViewList = F3(
 			A2($elm$core$List$range, start, end));
 	});
 var $elm$html$Html$tbody = _VirtualDom_node('tbody');
-var $author$project$Main$bodyView = function (model) {
+var $author$project$Main$tableBodyView = function (model) {
 	return A2(
 		$elm$html$Html$tbody,
 		_List_Nil,
@@ -5550,7 +5588,7 @@ var $author$project$Main$bodyView = function (model) {
 			$elm$core$Array$length(model.arrayInput) - 1));
 };
 var $elm$html$Html$thead = _VirtualDom_node('thead');
-var $author$project$Main$headerView = function (model) {
+var $author$project$Main$tableHeaderView = function (model) {
 	return A2(
 		$elm$html$Html$thead,
 		_List_fromArray(
@@ -5562,7 +5600,6 @@ var $author$project$Main$headerView = function (model) {
 				A2($author$project$Main$rowView, model, 0)
 			]));
 };
-var $elm$html$Html$table = _VirtualDom_node('table');
 var $author$project$Main$previewTableView = function (model) {
 	return A2(
 		$elm$html$Html$table,
@@ -5572,8 +5609,8 @@ var $author$project$Main$previewTableView = function (model) {
 			]),
 		_List_fromArray(
 			[
-				$author$project$Main$headerView(model),
-				$author$project$Main$bodyView(model)
+				$author$project$Main$tableHeaderView(model),
+				$author$project$Main$tableBodyView(model)
 			]));
 };
 var $author$project$Main$previewContainer = function (model) {
@@ -5585,16 +5622,6 @@ var $author$project$Main$previewContainer = function (model) {
 			]),
 		_List_fromArray(
 			[
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('title')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('preview')
-					])),
 				$author$project$Main$previewTableView(model)
 			]));
 };
@@ -5608,7 +5635,27 @@ var $author$project$Main$mainContainer = function (model) {
 			]),
 		_List_fromArray(
 			[
-				$author$project$Main$csvContainer(model),
+				$author$project$Main$headerView(model),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('preview-container')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('title')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('preview')
+							]))
+					])),
+				$author$project$Main$inputContainer(model),
 				$author$project$Main$previewContainer(model)
 			]));
 };

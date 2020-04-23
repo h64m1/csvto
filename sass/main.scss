@@ -12,18 +12,38 @@
 	grid-area: 'main';
 	display: grid;
 	grid-template-columns: 1fr 1fr;
-	grid-template-areas: 'csv preview';
+	grid-template-rows: 1fr 9fr;
+	grid-template-areas:
+		'input preview'
+		'input preview';
 }
 
 .title {
 	font-size: larger;
 }
 
-.csv-container {
-	grid-area: 'csv';
+.tab {
+	text-decoration: none;
+	color: black;
 }
 
-.csv-area {
+.tab-selected {
+	border-top: 1px solid #000;
+	border-left: 1px solid #000;
+	border-right: 1px solid #000;
+	padding: 0.5rem 0.5rem;
+}
+
+.tab-not-selected {
+	border-bottom: 1px solid #000;
+	padding: 0.5rem 0.5rem;
+}
+
+.csv-container {
+	grid-area: 'input';
+}
+
+.input-area {
 	font-size: medium;
 	height: 20rem;
 	width: 90%;
