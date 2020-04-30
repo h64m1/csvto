@@ -5,6 +5,7 @@ import Browser
 import Html exposing (Html, a, div, main_, nav, section, span, table, tbody, td, text, textarea, thead, tr)
 import Html.Attributes exposing (class, href, id, placeholder, value)
 import Html.Events exposing (onClick, onInput)
+import StringToArray exposing (CsvText, MarkdownText)
 
 
 main : Program () Model Msg
@@ -22,8 +23,8 @@ main =
 
 
 type alias Model =
-    { csvInput : String -- csvの入力値
-    , markdownInput : String -- markdownの入力値
+    { csvInput : CsvText -- csvの入力値
+    , markdownInput : MarkdownText -- markdownの入力値
     , arrayInput : Array (List String) -- csv入力を変換した2次元配列
     , showView : ViewDisplayState -- viewの表示状態
     }
@@ -65,25 +66,20 @@ update msg model =
         CsvInput input ->
             ( { model
                 | csvInput = input
-                , arrayInput =
-                    let
-                        -- 1. 改行コードで分割、2. カンマで分割、で行ごとに配列化
-                        array =
-                            input
-                                |> String.lines
-                                |> List.map (String.split ",")
-                                |> Array.fromList
-
-                        -- _ =
-                        --     Debug.log "array" array
-                    in
-                    array
+                , arrayInput = StringToArray.csvToArrayList input
+                , markdownInput = StringToArray.arrayListToMarkdown model.arrayInput
               }
             , Cmd.none
             )
 
         MarkdownInput input ->
-            ( { model | markdownInput = input }, Cmd.none )
+            ( { model
+                | markdownInput = input
+                , arrayInput = StringToArray.markdownToArrayList input
+                , csvInput = StringToArray.arrayListToCsv model.arrayInput
+              }
+            , Cmd.none
+            )
 
         ShowCsv ->
             ( { model | showView = Csv }, Cmd.none )
