@@ -1,11 +1,11 @@
-port module Main exposing (main)
+module Main exposing (main)
 
 import Array exposing (Array)
 import Browser
-import Debug
-import Html exposing (Html, button, div, main_, nav, section, table, tbody, td, text, textarea, thead, tr)
-import Html.Attributes exposing (class, id, placeholder, style, value)
+import Html exposing (Html, a, div, main_, nav, section, span, table, tbody, td, text, textarea, thead, tr)
+import Html.Attributes exposing (class, href, id, placeholder, value)
 import Html.Events exposing (onClick, onInput)
+import StringToArray exposing (CsvText, MarkdownText)
 
 
 main : Program () Model Msg
@@ -23,51 +23,69 @@ main =
 
 
 type alias Model =
-    { input : String
-    , arrayInput : Array (List String)
+    { csvInput : CsvText -- csvの入力値
+    , markdownInput : MarkdownText -- markdownの入力値
+    , arrayInput : Array (List String) -- csv入力を変換した2次元配列
+    , showView : ViewDisplayState -- viewの表示状態
     }
+
+
+
+{-
+   csv, markdown領域の表示管理フラグ
+   defaultではcsvを表示
+-}
+
+
+type ViewDisplayState
+    = Csv
+    | Markdown
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { input = "", arrayInput = Array.fromList [] }, Cmd.none )
+    ( { csvInput = ""
+      , markdownInput = ""
+      , arrayInput = Array.fromList []
+      , showView = Csv
+      }
+    , Cmd.none
+    )
 
 
 type Msg
-    = Input String
-    | Preview
+    = CsvInput String
+    | MarkdownInput String
+    | ShowCsv
+    | ShowMarkdown
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Input input ->
+        CsvInput input ->
             ( { model
-                | input =
-                    let
-                        _ =
-                            Debug.log "input" input
-                    in
-                    input
-                , arrayInput =
-                    let
-                        -- 1. 改行コードで分割、2. カンマで分割、で行ごとに配列化
-                        array =
-                            input
-                                |> String.lines
-                                |> List.map (String.split ",")
-                                |> Array.fromList
-
-                        _ =
-                            Debug.log "array" array
-                    in
-                    array
+                | csvInput = input
+                , arrayInput = StringToArray.csvToArrayList input
+                , markdownInput = StringToArray.arrayListToMarkdown model.arrayInput
               }
             , Cmd.none
             )
 
-        Preview ->
-            ( model, saveArray model.arrayInput )
+        MarkdownInput input ->
+            ( { model
+                | markdownInput = input
+                , arrayInput = StringToArray.markdownToArrayList input
+                , csvInput = StringToArray.arrayListToCsv model.arrayInput
+              }
+            , Cmd.none
+            )
+
+        ShowCsv ->
+            ( { model | showView = Csv }, Cmd.none )
+
+        ShowMarkdown ->
+            ( { model | showView = Markdown }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -94,9 +112,72 @@ view model =
 mainContainer : Model -> Html Msg
 mainContainer model =
     section [ class "main-container" ]
-        [ csvContainer model
+        [ headerView model
+        , div [ class "preview-container" ]
+            [ div [ class "title" ] [ text "preview" ]
+            ]
+        , inputContainer model
         , previewContainer model
         ]
+
+
+
+-- main header
+
+
+headerView : Model -> Html Msg
+headerView model =
+    div [ class "input-container" ]
+        [ tabView Csv model ShowCsv "csv"
+        , tabView Markdown model ShowMarkdown "markdown"
+        ]
+
+
+
+-- タブ表示
+
+
+tabView : ViewDisplayState -> Model -> Msg -> String -> Html Msg
+tabView state model msg title =
+    a [ class "tab", href "#" ]
+        [ span [ class (tabClassName state model), onClick msg ] [ text title ]
+        ]
+
+
+
+{-
+   tabの選択状態によって表示を切り替えるためのクラス指定
+   - selected: 選択状態
+   - not-selected: 選択されてない状態
+-}
+
+
+tabClassName : ViewDisplayState -> Model -> String
+tabClassName state model =
+    if state == model.showView then
+        "tab-selected"
+
+    else
+        "tab-not-selected"
+
+
+
+{-
+   入力可能な領域を表示するcontainer
+   showViewの状態によって表示領域を変える
+   csv: csv入力エリアを表示
+   markdown: markdown入力エリアを表示
+-}
+
+
+inputContainer : Model -> Html Msg
+inputContainer model =
+    case model.showView of
+        Csv ->
+            csvContainer model
+
+        Markdown ->
+            markdownContainer model
 
 
 
@@ -106,8 +187,18 @@ mainContainer model =
 csvContainer : Model -> Html Msg
 csvContainer model =
     div [ class "csv-container" ]
-        [ div [ class "title" ] [ text "csv", button [ onClick Preview ] [ text "preview" ] ]
-        , textarea [ class "csv-area", placeholder "csv: a, b, c, ...", value model.input, onInput Input ] [ text "" ]
+        [ textarea [ class "input-area", placeholder "csv: a, b, c, ...", value model.csvInput, onInput CsvInput ] [ text "" ]
+        ]
+
+
+
+-- MARKDOWN INPUT
+
+
+markdownContainer : Model -> Html Msg
+markdownContainer model =
+    div [ class "markdown-container" ]
+        [ textarea [ class "input-area", placeholder "write markdown table", value model.markdownInput, onInput MarkdownInput ] [ text "" ]
         ]
 
 
@@ -117,10 +208,7 @@ csvContainer model =
 
 previewContainer : Model -> Html Msg
 previewContainer model =
-    div [ class "preview-container" ]
-        [ div [ class "title" ] [ text "preview" ]
-        , previewTableView model
-        ]
+    div [ class "preview-container" ] [ previewTableView model ]
 
 
 
@@ -130,8 +218,8 @@ previewContainer model =
 previewTableView : Model -> Html Msg
 previewTableView model =
     table [ class "preview-area" ]
-        [ headerView model
-        , bodyView model
+        [ tableHeaderView model
+        , tableBodyView model
         ]
 
 
@@ -139,8 +227,8 @@ previewTableView model =
 -- タイトル行
 
 
-headerView : Model -> Html Msg
-headerView model =
+tableHeaderView : Model -> Html Msg
+tableHeaderView model =
     thead [ class "preview-header" ] [ rowView model 0 ]
 
 
@@ -148,8 +236,8 @@ headerView model =
 -- テーブル本体
 
 
-bodyView : Model -> Html Msg
-bodyView model =
+tableBodyView : Model -> Html Msg
+tableBodyView model =
     tbody []
         (rowViewList model 1 (Array.length model.arrayInput - 1))
 
@@ -202,4 +290,5 @@ tdElement input =
     td [] [ text input ]
 
 
-port saveArray : Array (List String) -> Cmd msg
+
+-- port saveArray : Array (List String) -> Cmd msg
