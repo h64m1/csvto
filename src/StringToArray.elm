@@ -52,9 +52,9 @@ arrayListToCsv array2d =
 
 {-
    各配列要素の末尾に改行コードを付加
-   - 各要素の配列をcsv文字列化 (,でjoin)
-   - 各要素の末尾に改行コードを追加
-   - 配列要素をconcatで連結
+   1. 各要素の配列をcsv文字列化 (,でjoin)
+   2. 各要素の末尾に改行コードを追加
+   3. 配列要素をconcatで連結
 -}
 
 
@@ -89,8 +89,9 @@ appendLineBreakTo text =
 {-
    markdown -> array
    1. 改行コードで分割
-   2. 先頭と末尾の"|"を削除
-   3. "|"で分割、で行ごとに配列化
+   2. markdown用のフォーマット (:--)が存在する行を落とす
+   3. 先頭と末尾の"|"を削除
+   4. "|"で分割、で行ごとに配列化
 -}
 
 
@@ -98,8 +99,40 @@ markdownToArrayList : MarkdownText -> Array2D
 markdownToArrayList markdown =
     markdown
         |> String.lines
+        |> List.filter notMarkdownFormat
         |> List.map splitStringByVerticalBar
         |> Array.fromList
+
+
+
+{-
+   markdown文字列の中に":--"が含まれているかどうか
+   含まれていないパターンを残したいので
+   - ":--"が含まれている場合 -> False
+   - ":--"が含まれていない場合 -> True
+-}
+
+
+notMarkdownFormat : String -> Bool
+notMarkdownFormat text =
+    let
+        isFormatContained =
+            text
+                |> String.split "|"
+                |> List.member markdownTextAlignLeft
+    in
+    not isFormatContained
+
+
+
+{-
+   markdownのtext-align: left
+-}
+
+
+markdownTextAlignLeft : String
+markdownTextAlignLeft =
+    ":--"
 
 
 
@@ -118,11 +151,9 @@ arrayListToMarkdown array2d =
 
 {-
    2次元配列をmarkdownフォーマットに変換
-   - 2d -> 1d変換、2次元の各要素は|で連結
-   - 2行目に左右のtext align用フォーマットを追加
-   - 残りの要素と連結
-   - 先頭と末尾にも | を追加
-   - 改行コードを追加して、文字列化
+   1. 2d -> 1d変換、2次元の各要素は|で連結
+   2. 2行目に左右のtext align用フォーマットを追加
+   3. 残りの要素と連結
 -}
 
 
