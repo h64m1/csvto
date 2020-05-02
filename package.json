@@ -11,9 +11,9 @@
 	"devDependencies": {},
 	"scripts": {
 		"build": "npm run build:elm & npm run build:ts & npm run css",
-		"build:elm": "elm make src/Main.elm --output=main.js",
+		"build:elm": "elm make src/Main.elm --output=dist/main.js",
 		"build:ts": "tsc ts/array.ts --outFile dist/array.js",
-		"css": "sass sass/main.scss main.css",
+		"css": "sass sass/main.scss dist/main.css",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"repository": {
