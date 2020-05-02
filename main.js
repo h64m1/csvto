@@ -5482,6 +5482,56 @@ var $author$project$StringToArray$csvToArrayList = function (csv) {
 			$elm$core$String$split(','),
 			$elm$core$String$lines(csv)));
 };
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $author$project$StringToArray$markdownTextAlignLeft = ':--';
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
+var $elm$core$Basics$not = _Basics_not;
+var $author$project$StringToArray$notMarkdownFormat = function (text) {
+	var isFormatContained = A2(
+		$elm$core$List$member,
+		$author$project$StringToArray$markdownTextAlignLeft,
+		A2($elm$core$String$split, '|', text));
+	return !isFormatContained;
+};
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
@@ -5506,7 +5556,10 @@ var $author$project$StringToArray$markdownToArrayList = function (markdown) {
 		A2(
 			$elm$core$List$map,
 			$author$project$StringToArray$splitStringByVerticalBar,
-			$elm$core$String$lines(markdown)));
+			A2(
+				$elm$core$List$filter,
+				$author$project$StringToArray$notMarkdownFormat,
+				$elm$core$String$lines(markdown))));
 };
 var $author$project$Main$update = F2(
 	function (msg, model) {
