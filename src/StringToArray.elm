@@ -1,4 +1,4 @@
-module StringToArray exposing (CsvText, MarkdownText, arrayListToCsv, arrayListToMarkdown, csvToArrayList, markdownToArrayList)
+module StringToArray exposing (..)
 
 import Array exposing (Array)
 
@@ -227,20 +227,9 @@ appendTextAlignFormatter list n =
 
 
 {-
-   文字列の先頭と末尾から"|"を削除する
--}
-
-
-dropVerticalBar : MarkdownText -> String
-dropVerticalBar markdown =
-    markdown
-        |> String.dropLeft 1
-        |> String.dropRight 1
-
-
-
-{-
    文字列の先頭と末尾の"|"を削除し、"|"で配列に分割する
+   splitStringByVerticalBar "|column1|column2|"
+   -> ["column1", "column2"]
 -}
 
 
@@ -249,3 +238,36 @@ splitStringByVerticalBar text =
     text
         |> dropVerticalBar
         |> String.split "|"
+
+
+
+{-
+   文字列の先頭または末尾に含まれる"|"を削除する
+   dropVerticalBar "|column1|column2|"
+   -> "column1|column2"
+-}
+
+
+dropVerticalBar : MarkdownText -> String
+dropVerticalBar markdown =
+    let
+        -- 先頭が"|"の場合削除
+        removeStart =
+            if String.startsWith "|" markdown then
+                String.dropLeft 1 markdown
+
+            else
+                markdown
+
+        -- 末尾が"|"の場合削除
+        removeEnd =
+            if String.endsWith "|" removeStart then
+                String.dropRight 1 removeStart
+
+            else
+                removeStart
+
+        result =
+            removeEnd
+    in
+    result
