@@ -184,20 +184,37 @@ convertList2DToMarkdown list2d =
 
 
 {-
-   markdown用: 先頭と末尾に | を追加
+   markdown用: 先頭と末尾に"|"を追加
+   - 空の文字列の場合は何もしない
+   - 先頭または末尾にすでに"|"がある場合は何もしない
 -}
 
 
 addVerticalBar : String -> String
 addVerticalBar text =
-    let
-        result1 =
-            String.append "|" text
+    case String.length text of
+        0 ->
+            text
 
-        result2 =
-            String.append result1 "|"
-    in
-    result2
+        _ ->
+            let
+                -- 先頭が"|"の場合はtextをそのまま返す
+                result1 =
+                    if String.startsWith "|" text then
+                        text
+
+                    else
+                        String.append "|" text
+
+                -- 末尾が"|"の場合はtextをそのまま返す
+                result2 =
+                    if String.endsWith "|" result1 then
+                        result1
+
+                    else
+                        String.append result1 "|"
+            in
+            result2
 
 
 
@@ -213,24 +230,29 @@ addVerticalBar text =
 
 appendTextAlignFormatter : List String -> Int -> List String
 appendTextAlignFormatter list n =
-    let
-        first =
-            List.take 1 list
+    case n of
+        0 ->
+            list
 
-        second =
-            List.repeat n ":--" |> String.join "|"
+        _ ->
+            let
+                first =
+                    List.take 1 list
 
-        firstAndSecond =
-            List.append first [ second ]
+                second =
+                    List.repeat n ":--" |> String.join "|"
 
-        -- 残りの行を抽出
-        remain =
-            List.drop 1 list
+                firstAndSecond =
+                    List.append first [ second ]
 
-        combined =
-            firstAndSecond ++ remain
-    in
-    combined
+                -- 残りの行を抽出
+                remain =
+                    List.drop 1 list
+
+                combined =
+                    firstAndSecond ++ remain
+            in
+            combined
 
 
 
