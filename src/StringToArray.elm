@@ -170,15 +170,8 @@ convertList2DToMarkdown list2d =
             List.take 1 list2d |> List.concat |> List.length
 
         -- 2行目にmarkdownテーブルの左右位置フォーマットを追加
-        first =
-            appendTextAlignFormatter list n
-
-        -- 残りの行を抽出
-        remain =
-            List.drop 1 list
-
         combined =
-            first ++ remain
+            appendTextAlignFormatter list n
 
         text =
             combined
@@ -210,6 +203,11 @@ addVerticalBar text =
 
 {-
    markdown用: 配列の末尾にmarkdownのフォーマットを追加
+   1. 入力した配列から最初の要素を取得
+   2. 2行目に追加するmarkdownフォーマット (:--|:--...)を生成
+   3. 1行目と2行目を配列化
+   4. 入力配列の2行目移行を抽出
+   5. 3と4を組み合わせて出力用の配列を生成
 -}
 
 
@@ -221,8 +219,18 @@ appendTextAlignFormatter list n =
 
         second =
             List.repeat n ":--" |> String.join "|"
+
+        firstAndSecond =
+            List.append first [ second ]
+
+        -- 残りの行を抽出
+        remain =
+            List.drop 1 list
+
+        combined =
+            firstAndSecond ++ remain
     in
-    List.append first [ second ]
+    combined
 
 
 
