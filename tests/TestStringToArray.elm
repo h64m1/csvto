@@ -27,7 +27,15 @@ suite =
             , test_appendTextAlignFormatter [ "a|b|c" ] 3 [ "a|b|c", ":--|:--|:--" ]
             , test_appendTextAlignFormatter [ "a" ] 1 [ "a", ":--" ]
             , test_appendTextAlignFormatter [ "a|b" ] 2 [ "a|b", ":--|:--" ]
-            , test_appendTextAlignFormatter [ "" ] 1 [ "", ":--" ]
+            , test_appendTextAlignFormatter [ "" ] 0 [ "" ]
+            ]
+        , describe "Test addVerticalBar"
+            [ test_addVerticalBar "a|b|c" "|a|b|c|"
+            , test_addVerticalBar "a" "|a|"
+            , test_addVerticalBar "|a|" "|a|"
+            , test_addVerticalBar "|a" "|a|"
+            , test_addVerticalBar "a|" "|a|"
+            , test_addVerticalBar "" ""
             ]
         ]
 
@@ -70,5 +78,19 @@ test_appendTextAlignFormatter input n output =
         [ test ("[" ++ String.join "," input ++ "]" ++ " should be equal to be " ++ "[" ++ String.join "," output ++ "]") <|
             \_ ->
                 appendTextAlignFormatter input n
+                    |> Expect.equal output
+        ]
+
+
+
+-- addVerticalBar : String -> String
+
+
+test_addVerticalBar : String -> String -> Test
+test_addVerticalBar input output =
+    describe ("Test addVerticalBar for " ++ input)
+        [ test (input ++ " should be equal to be " ++ output) <|
+            \_ ->
+                addVerticalBar input
                     |> Expect.equal output
         ]
