@@ -37,6 +37,16 @@ suite =
             , test_addVerticalBar "a|" "|a|"
             , test_addVerticalBar "" ""
             ]
+        , describe "Test appendLineBreak"
+            [ test_appendLineBreak "text" "text\n"
+            , test_appendLineBreak "" ""
+            ]
+        , describe "Test convertList2DToMarkdown"
+            [ test_convertList2DToMarkdown [ [ "a", "b", "c" ], [ "d", "e", "f" ] ] "|a|b|c|\n|:--|:--|:--|\n|d|e|f|\n"
+            , test_convertList2DToMarkdown [ [ "a", "b", "c" ] ] "|a|b|c|\n|:--|:--|:--|\n"
+            , test_convertList2DToMarkdown [] ""
+            , test_convertList2DToMarkdown [ [ "a" ] ] "|a|\n|:--|\n"
+            ]
         ]
 
 
@@ -94,3 +104,53 @@ test_addVerticalBar input output =
                 addVerticalBar input
                     |> Expect.equal output
         ]
+
+
+
+-- appendLineBreak : String -> String
+
+
+test_appendLineBreak : String -> String -> Test
+test_appendLineBreak input output =
+    describe ("Test appendLineBreak for " ++ input)
+        [ test (input ++ " should be equal to be " ++ output) <|
+            \_ ->
+                appendLineBreak input
+                    |> Expect.equal output
+        ]
+
+
+
+-- convertList2DToMarkdown : List (List String) -> MarkdownText
+
+
+test_convertList2DToMarkdown : List (List String) -> MarkdownText -> Test
+test_convertList2DToMarkdown input output =
+    describe ("Test convertList2DToMarkdown for " ++ list2dToText input)
+        [ test (list2dToText input ++ " should be equal to be " ++ output) <|
+            \_ ->
+                convertList2DToMarkdown input
+                    |> Expect.equal output
+        ]
+
+
+
+-- 2次元リストをStringに変換
+
+
+list2dToText : List (List String) -> String
+list2dToText list2d =
+    let
+        list1 =
+            list2d |> List.map (String.join ",")
+
+        list2 =
+            List.map (\e -> "[" ++ e ++ "]") list1
+
+        text1 =
+            String.join "," list2
+
+        text2 =
+            "[" ++ text1 ++ "]"
+    in
+    text2
