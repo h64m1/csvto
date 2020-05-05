@@ -67,7 +67,7 @@ convertList2DToCsv list2d =
 
         text =
             list
-                |> List.map appendLineBreakTo
+                |> List.map appendLineBreak
                 |> String.concat
     in
     text
@@ -76,12 +76,18 @@ convertList2DToCsv list2d =
 
 {-
    文字列の末尾に改行コードを付加
+   - 文字数 = 0の場合は空文字を返す
 -}
 
 
-appendLineBreakTo : String -> String
-appendLineBreakTo text =
-    String.append text "\n"
+appendLineBreak : String -> String
+appendLineBreak text =
+    case String.length text of
+        0 ->
+            ""
+
+        _ ->
+            String.append text "\n"
 
 
 
@@ -176,7 +182,7 @@ convertList2DToMarkdown list2d =
         text =
             combined
                 |> List.map addVerticalBar
-                |> List.map appendLineBreakTo
+                |> List.map appendLineBreak
                 |> String.concat
     in
     text
