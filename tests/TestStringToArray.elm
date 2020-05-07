@@ -1,7 +1,22 @@
-module TestStringToArray exposing (..)
+module TestStringToArray exposing (suite)
 
+import Array exposing (Array)
 import Expect
-import StringToArray exposing (..)
+import StringToArray
+    exposing
+        ( CsvText
+        , MarkdownText
+        , addVerticalBar
+        , appendLineBreak
+        , appendTextAlignFormatter
+        , convertList2DToCsv
+        , convertList2DToMarkdown
+        , csvToArrayList
+        , dropVerticalBar
+        , markdownToArrayList
+        , notMarkdownFormat
+        , splitStringByVerticalBar
+        )
 import Test exposing (Test, describe, test)
 
 
@@ -45,7 +60,39 @@ suite =
             [ test_convertList2DToMarkdown [ [ "a", "b", "c" ], [ "d", "e", "f" ] ] "|a|b|c|\n|:--|:--|:--|\n|d|e|f|\n"
             , test_convertList2DToMarkdown [ [ "a", "b", "c" ] ] "|a|b|c|\n|:--|:--|:--|\n"
             , test_convertList2DToMarkdown [] ""
+            , test_convertList2DToMarkdown [ [] ] ""
             , test_convertList2DToMarkdown [ [ "a" ] ] "|a|\n|:--|\n"
+            ]
+        , describe "Test notMarkdowFormat"
+            [ test_notMarkdownFormat "a" (not False)
+            , test_notMarkdownFormat ":--" (not True)
+            , test_notMarkdownFormat "|:--|" (not True)
+            , test_notMarkdownFormat ":--|" (not True)
+            , test_notMarkdownFormat "|:--" (not True)
+            , test_notMarkdownFormat ":-" (not False)
+            , test_notMarkdownFormat ":ab" (not False)
+            , test_notMarkdownFormat ":a:-" (not False)
+            , test_notMarkdownFormat "--:a:" (not False)
+            , test_notMarkdownFormat "a:--" (not False)
+            , test_notMarkdownFormat "a:--|:--" (not True)
+            ]
+        , describe "Test markdownToArrayList"
+            [ test_markdownToArrayList "|a|b|\n|:--|:--|\n|c|d|" (Array.fromList [ [ "a", "b" ], [ "c", "d" ] ])
+            , test_markdownToArrayList "|a|b|" (Array.fromList [ [ "a", "b" ] ])
+            , test_markdownToArrayList "|a|\n|:--|" (Array.fromList [ [ "a" ] ])
+            , test_markdownToArrayList "" (Array.fromList [ [ "" ] ])
+            ]
+        , describe "Test convertList2DToCsv"
+            [ test_convertList2DToCsv [ [ "a", "b" ] ] "a,b\n"
+            , test_convertList2DToCsv [ [ "a", "b" ], [ "c", "d" ] ] "a,b\nc,d\n"
+            , test_convertList2DToCsv [ [ "" ] ] ""
+            , test_convertList2DToCsv [ [ "a" ] ] "a\n"
+            ]
+        , describe "Test csvToArrayList"
+            [ test_csvToArrayList "a,b" (Array.fromList [ [ "a", "b" ] ])
+            , test_csvToArrayList "a,b\nc,d" (Array.fromList [ [ "a", "b" ], [ "c", "d" ] ])
+            , test_csvToArrayList "" (Array.fromList [ [ "" ] ])
+            , test_csvToArrayList "a\n" (Array.fromList [ [ "a" ], [ "" ] ])
             ]
         ]
 
@@ -126,8 +173,8 @@ test_appendLineBreak input output =
 
 test_convertList2DToMarkdown : List (List String) -> MarkdownText -> Test
 test_convertList2DToMarkdown input output =
-    describe ("Test convertList2DToMarkdown for " ++ list2dToText input)
-        [ test (list2dToText input ++ " should be equal to be " ++ output) <|
+    describe ("Test convertList2DToMarkdown for " ++ list2dToString input)
+        [ test (list2dToString input ++ " should be equal to be " ++ output) <|
             \_ ->
                 convertList2DToMarkdown input
                     |> Expect.equal output
@@ -135,11 +182,70 @@ test_convertList2DToMarkdown input output =
 
 
 
--- 2次元リストをStringに変換
+-- notMarkdownFormat : String -> Bool
 
 
-list2dToText : List (List String) -> String
-list2dToText list2d =
+test_notMarkdownFormat : String -> Bool -> Test
+test_notMarkdownFormat input output =
+    describe ("Test notMarkdownFormat for " ++ input)
+        [ test (input ++ " should be equal to be " ++ boolToString output) <|
+            \_ ->
+                notMarkdownFormat input
+                    |> Expect.equal output
+        ]
+
+
+
+-- markdownToArrayList : MarkdownText -> Array2D
+
+
+test_markdownToArrayList : MarkdownText -> Array (List String) -> Test
+test_markdownToArrayList input output =
+    describe ("Test markdownToArrayList for " ++ input)
+        [ test (input ++ " should be equal to be " ++ array2dToString output) <|
+            \_ ->
+                markdownToArrayList input
+                    |> Expect.equal output
+        ]
+
+
+
+-- convertList2DToCsv : List2D -> String
+
+
+test_convertList2DToCsv : List (List String) -> String -> Test
+test_convertList2DToCsv input output =
+    describe ("Test convertList2DToCsv for " ++ list2dToString input)
+        [ test (list2dToString input ++ " should be equal to be " ++ output) <|
+            \_ ->
+                convertList2DToCsv input
+                    |> Expect.equal output
+        ]
+
+
+
+-- csvToArrayList : CsvText -> Array2D
+
+
+test_csvToArrayList : CsvText -> Array (List String) -> Test
+test_csvToArrayList input output =
+    describe ("Test csvToArrayList for " ++ input)
+        [ test (input ++ " should be equal to be " ++ array2dToString output) <|
+            \_ ->
+                csvToArrayList input
+                    |> Expect.equal output
+        ]
+
+
+
+-- string conversion
+{-
+   2d list -> String
+-}
+
+
+list2dToString : List (List String) -> String
+list2dToString list2d =
     let
         list1 =
             list2d |> List.map (String.join ",")
@@ -154,3 +260,39 @@ list2dToText list2d =
             "[" ++ text1 ++ "]"
     in
     text2
+
+
+
+{-
+   array list -> String
+-}
+
+
+array2dToString : Array (List String) -> String
+array2dToString array2d =
+    let
+        list2d =
+            array2d
+                |> Array.toList
+
+        text =
+            list2dToString list2d
+    in
+    text
+
+
+
+{-
+   convert Bool to String
+   - True -> "True"
+   - False -> "False"
+-}
+
+
+boolToString : Bool -> String
+boolToString input =
+    if input == True then
+        "True"
+
+    else
+        "False"

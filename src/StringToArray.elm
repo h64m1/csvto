@@ -1,4 +1,19 @@
-module StringToArray exposing (..)
+module StringToArray exposing
+    ( CsvText
+    , MarkdownText
+    , addVerticalBar
+    , appendLineBreak
+    , appendTextAlignFormatter
+    , arrayListToCsv
+    , arrayListToMarkdown
+    , convertList2DToCsv
+    , convertList2DToMarkdown
+    , csvToArrayList
+    , dropVerticalBar
+    , markdownToArrayList
+    , notMarkdownFormat
+    , splitStringByVerticalBar
+    )
 
 import Array exposing (Array)
 
