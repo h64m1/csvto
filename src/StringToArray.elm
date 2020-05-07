@@ -1,4 +1,19 @@
-module StringToArray exposing (CsvText, MarkdownText, arrayListToCsv, arrayListToMarkdown, csvToArrayList, markdownToArrayList)
+module StringToArray exposing
+    ( CsvText
+    , MarkdownText
+    , addVerticalBar
+    , appendLineBreak
+    , appendTextAlignFormatter
+    , arrayListToCsv
+    , arrayListToMarkdown
+    , convertList2DToCsv
+    , convertList2DToMarkdown
+    , csvToArrayList
+    , dropVerticalBar
+    , markdownToArrayList
+    , notMarkdownFormat
+    , splitStringByVerticalBar
+    )
 
 import Array exposing (Array)
 
@@ -67,7 +82,7 @@ convertList2DToCsv list2d =
 
         text =
             list
-                |> List.map appendLineBreakTo
+                |> List.map appendLineBreak
                 |> String.concat
     in
     text
@@ -76,12 +91,18 @@ convertList2DToCsv list2d =
 
 {-
    文字列の末尾に改行コードを付加
+   - 文字数 = 0の場合は空文字を返す
 -}
 
 
-appendLineBreakTo : String -> String
-appendLineBreakTo text =
-    String.append text "\n"
+appendLineBreak : String -> String
+appendLineBreak text =
+    case String.length text of
+        0 ->
+            ""
+
+        _ ->
+            String.append text "\n"
 
 
 
@@ -170,20 +191,13 @@ convertList2DToMarkdown list2d =
             List.take 1 list2d |> List.concat |> List.length
 
         -- 2行目にmarkdownテーブルの左右位置フォーマットを追加
-        first =
-            appendTextAlignFormatter list n
-
-        -- 残りの行を抽出
-        remain =
-            List.drop 1 list
-
         combined =
-            first ++ remain
+            appendTextAlignFormatter list n
 
         text =
             combined
                 |> List.map addVerticalBar
-                |> List.map appendLineBreakTo
+                |> List.map appendLineBreak
                 |> String.concat
     in
     text
@@ -191,56 +205,82 @@ convertList2DToMarkdown list2d =
 
 
 {-
-   markdown用: 先頭と末尾に | を追加
+   markdown用: 先頭と末尾に"|"を追加
+   - 空の文字列の場合は何もしない
+   - 先頭または末尾にすでに"|"がある場合は何もしない
 -}
 
 
 addVerticalBar : String -> String
 addVerticalBar text =
-    let
-        result1 =
-            String.append "|" text
+    case String.length text of
+        0 ->
+            text
 
-        result2 =
-            String.append result1 "|"
-    in
-    result2
+        _ ->
+            let
+                -- 先頭が"|"の場合はtextをそのまま返す
+                result1 =
+                    if String.startsWith "|" text then
+                        text
+
+                    else
+                        String.append "|" text
+
+                -- 末尾が"|"の場合はtextをそのまま返す
+                result2 =
+                    if String.endsWith "|" result1 then
+                        result1
+
+                    else
+                        String.append result1 "|"
+            in
+            result2
 
 
 
 {-
    markdown用: 配列の末尾にmarkdownのフォーマットを追加
+   1. 入力した配列から最初の要素を取得
+   2. 2行目に追加するmarkdownフォーマット (:--|:--...)を生成
+   3. 1行目と2行目を配列化
+   4. 入力配列の2行目移行を抽出
+   5. 3と4を組み合わせて出力用の配列を生成
 -}
 
 
 appendTextAlignFormatter : List String -> Int -> List String
 appendTextAlignFormatter list n =
-    let
-        first =
-            List.take 1 list
+    case n of
+        0 ->
+            list
 
-        second =
-            List.repeat n ":--" |> String.join "|"
-    in
-    List.append first [ second ]
+        _ ->
+            let
+                first =
+                    List.take 1 list
 
+                second =
+                    List.repeat n ":--" |> String.join "|"
 
+                firstAndSecond =
+                    List.append first [ second ]
 
-{-
-   文字列の先頭と末尾から"|"を削除する
--}
+                -- 残りの行を抽出
+                remain =
+                    List.drop 1 list
 
-
-dropVerticalBar : MarkdownText -> String
-dropVerticalBar markdown =
-    markdown
-        |> String.dropLeft 1
-        |> String.dropRight 1
+                combined =
+                    firstAndSecond ++ remain
+            in
+            combined
 
 
 
 {-
    文字列の先頭と末尾の"|"を削除し、"|"で配列に分割する
+   splitStringByVerticalBar "|column1|column2|"
+   -> ["column1", "column2"]
 -}
 
 
@@ -249,3 +289,36 @@ splitStringByVerticalBar text =
     text
         |> dropVerticalBar
         |> String.split "|"
+
+
+
+{-
+   文字列の先頭または末尾に含まれる"|"を削除する
+   dropVerticalBar "|column1|column2|"
+   -> "column1|column2"
+-}
+
+
+dropVerticalBar : MarkdownText -> String
+dropVerticalBar markdown =
+    let
+        -- 先頭が"|"の場合削除
+        removeStart =
+            if String.startsWith "|" markdown then
+                String.dropLeft 1 markdown
+
+            else
+                markdown
+
+        -- 末尾が"|"の場合削除
+        removeEnd =
+            if String.endsWith "|" removeStart then
+                String.dropRight 1 removeStart
+
+            else
+                removeStart
+
+        result =
+            removeEnd
+    in
+    result
