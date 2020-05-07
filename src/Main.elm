@@ -64,19 +64,27 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         CsvInput input ->
+            let
+                arrayInput =
+                    StringToArray.csvToArrayList input
+            in
             ( { model
                 | csvInput = input
-                , arrayInput = StringToArray.csvToArrayList input
-                , markdownInput = StringToArray.arrayListToMarkdown model.arrayInput
+                , arrayInput = arrayInput
+                , markdownInput = StringToArray.arrayListToMarkdown arrayInput
               }
             , Cmd.none
             )
 
         MarkdownInput input ->
+            let
+                arrayInput =
+                    StringToArray.markdownToArrayList input
+            in
             ( { model
                 | markdownInput = input
-                , arrayInput = StringToArray.markdownToArrayList input
-                , csvInput = StringToArray.arrayListToCsv model.arrayInput
+                , arrayInput = arrayInput
+                , csvInput = StringToArray.arrayListToCsv arrayInput
               }
             , Cmd.none
             )
