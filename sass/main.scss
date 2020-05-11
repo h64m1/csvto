@@ -1,3 +1,7 @@
+body {
+	font-family: Helvetica, Arial, sans-serif;
+}
+
 #app {
 	display: grid;
 	grid-template-columns: 10rem 1fr 10rem;
@@ -5,21 +9,35 @@
 }
 
 #left-nav {
-	grid-area: 'nav';
+	grid-area: nav;
 }
 
 .main-container {
-	grid-area: 'main';
+	grid-area: main;
 	display: grid;
 	grid-template-columns: 1fr 1fr;
-	grid-template-rows: 1fr 9fr;
+	grid-template-rows: 1fr 1fr 9fr 1fr;
 	grid-template-areas:
+		'title title'
+		'input-header preview-header'
 		'input preview'
-		'input preview';
+		'footer footer';
 }
 
 .title {
-	font-size: larger;
+	grid-area: title;
+}
+
+.tab-container {
+	grid-area: input-header;
+}
+
+.preview-title-container {
+	grid-area: preview-header;
+}
+
+.preview-title {
+	font-size: large;
 }
 
 .tab {
@@ -31,16 +49,22 @@
 	border-top: 1px solid #000;
 	border-left: 1px solid #000;
 	border-right: 1px solid #000;
-	padding: 0.5rem 0.5rem;
+	padding: 0.2rem 0.5rem;
 }
 
 .tab-not-selected {
 	border-bottom: 1px solid #000;
-	padding: 0.5rem 0.5rem;
+	padding: 0.2rem 0.5rem;
+}
+
+.footer {
+	grid-area: footer;
+	font-size: small;
+	text-align: right;
 }
 
 .csv-container {
-	grid-area: 'input';
+	grid-area: input;
 }
 
 .input-area {
@@ -50,7 +74,7 @@
 }
 
 .preview-container {
-	grid-area: 'preview';
+	grid-area: preview;
 }
 
 .preview-area {
