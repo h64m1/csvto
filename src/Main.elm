@@ -3,7 +3,7 @@ module Main exposing (main)
 import Array exposing (Array)
 import Browser
 import Html exposing (Html, a, div, main_, nav, section, span, table, tbody, td, text, textarea, thead, tr)
-import Html.Attributes exposing (class, href, id, placeholder, value)
+import Html.Attributes exposing (class, href, id, placeholder, target, value)
 import Html.Events exposing (onClick, onInput)
 import StringToArray exposing (CsvText, MarkdownText)
 
@@ -120,12 +120,14 @@ view model =
 mainContainer : Model -> Html Msg
 mainContainer model =
     section [ class "main-container" ]
-        [ headerView model
-        , div [ class "preview-container" ]
-            [ div [ class "title" ] [ text "preview" ]
+        [ div [ class "title" ] []
+        , headerView model
+        , div [ class "preview-title-container" ]
+            [ div [ class "preview-title" ] [ text "preview" ]
             ]
         , inputContainer model
         , previewContainer model
+        , footerView
         ]
 
 
@@ -135,10 +137,33 @@ mainContainer model =
 
 headerView : Model -> Html Msg
 headerView model =
-    div [ class "input-container" ]
+    div [ class "tab-container" ]
         [ tabView Csv model ShowCsv "csv"
         , tabView Markdown model ShowMarkdown "markdown"
         ]
+
+
+
+-- footer
+
+
+footerView : Html Msg
+footerView =
+    div [ class "footer" ]
+        [ text "created by "
+        , footerLink "https://github.com/h64m1" "h64m1"
+        , text " | "
+        , footerLink "https://github.com/h64m1/csvto" "repository"
+        ]
+
+
+
+-- footer link
+
+
+footerLink : String -> String -> Html msg
+footerLink link description =
+    a [ href link, target "_blank" ] [ text description ]
 
 
 
